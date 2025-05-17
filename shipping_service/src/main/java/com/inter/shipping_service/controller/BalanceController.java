@@ -2,7 +2,11 @@ package com.inter.shipping_service.controller;
 
 import com.inter.shipping_service.dto.BalanceDto;
 import com.inter.shipping_service.model.Balance;
+import com.inter.shipping_service.model.User;
 import com.inter.shipping_service.repository.BalanceRepository;
+import com.inter.shipping_service.repository.UserRepository;
+import com.inter.shipping_service.service.BalanceService;
+import com.inter.shipping_service.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,27 +22,15 @@ import java.util.UUID;
 public class BalanceController {
 
     @Autowired
-    private BalanceRepository balanceRepository;
+    private BalanceService balanceService;
+    private UserService userService;
 
-    @PutMapping("/balance/{id}/{typeBalance}")
-    public ResponseEntity<Object> putBalance(@PathVariable(value = "id") long id,
-                                              @Valid Balanc balanceDto){
-
-        Optional<Balance> existId = balanceRepository.findById(id);
-        if(existId.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
+    @GetMapping("/{documentNumber}")
+    public void getBalancebyDocumentNumber(@RequestParam String documentNumber) {
+        Optional<User> user = Optional.ofNullable(userService.getBalanceByDocumentNumber(documentNumber));
+        if (user.isPresent()) {
+            userService.getBalanceByDocumentNumber(documentNumber);
         }
-
-        var balance = new Balance();
-        BeanUtils.copyProperties(B);
-
-
-    }
-
-    @GetMapping("/balance/{id}/{typeBalance}")
-    public void balance(){
-        balanceRepository.
-
     }
 
 }

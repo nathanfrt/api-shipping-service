@@ -9,9 +9,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/balance")
 public class ShippingController {
 
-    @Autowired
-    @PostMapping("/shipping")
-    public void shipping(){}
 
 
 

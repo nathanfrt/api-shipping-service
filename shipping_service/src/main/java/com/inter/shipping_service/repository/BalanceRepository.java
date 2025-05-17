@@ -3,11 +3,10 @@ package com.inter.shipping_service.repository;
 import com.inter.shipping_service.model.Balance;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
+import java.util.Optional;
 
 public interface BalanceRepository extends JpaRepository<Balance, Long> {
-    Balance getBalanceById(long id);
+    Optional<Balance>findByDocumentNumber(String documentNumber);
 
-
-    Long id(Long id);
+    Balance getBalanceByDocumentNumber(String documentNumber);
 }

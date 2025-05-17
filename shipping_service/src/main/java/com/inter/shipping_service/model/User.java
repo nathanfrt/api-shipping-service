@@ -1,9 +1,11 @@
 package com.inter.shipping_service.model;
 
+import com.inter.shipping_service.dto.UserDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.beans.BeanUtils;
 
 @Data
 @AllArgsConstructor
@@ -17,7 +19,6 @@ public class User {
 
     private String name;
     private String password;
-    private String phone;
 
     @Column(unique = true)
     private String email;
@@ -30,4 +31,15 @@ public class User {
 
     private Double balanceReal;
     private Double balanceDolar;
+
+    public User(UserDto user) {
+        BeanUtils.copyProperties(user, this);
+    }
+
+    public User(Double balanceReal, Double balanceDolar) {
+        this.balanceReal = balanceReal;
+        this.balanceDolar = balanceDolar;
+    }
+
+
 }
