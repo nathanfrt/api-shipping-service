@@ -1,13 +1,12 @@
 package com.inter.shipping_service.service;
 
 import com.inter.shipping_service.dto.UserDto;
+import com.inter.shipping_service.exception.PfPjException;
+import com.inter.shipping_service.model.BalanceResponse;
 import com.inter.shipping_service.model.TypeUser;
 import com.inter.shipping_service.model.User;
 import com.inter.shipping_service.repository.UserRepository;
-import org.hibernate.type.SetType;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,14 +29,14 @@ public class UserService {
         return userRepository.findById(id).orElse(null);
     }
 
-    // Buscar saldo através do documento
-    public User getBalanceByDocumentNumber(@PathVariable String documentNumber){
-        return userRepository.findByDocumentNumber(documentNumber).orElse(null);
+    // Buscar usuário por documento
+    public User getUserByDocumentNumber(@PathVariable String documentNumber){
+        return userRepository.findUserByDocumentNumber(documentNumber);
     }
 
-
     // Salvar usuário
-    public ResponseEntity<String> saveUser(@RequestBody UserDto userDto){
+    public User saveUser(@RequestBody UserDto userDto){
+
         String document = userDto.documentNumber();
         TypeUser typeUser = null;
 
@@ -47,18 +46,32 @@ public class UserService {
         else if(document != null && document.length() == 14) {
             typeUser = TypeUser.PJ;
         }
-        else return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Document Number must be 11 (CPF) or 14 (CNPJ) digits.");
+        else throw new PfPjException("CPF inválido");
 
         User user = new User(userDto);
         user.setType(typeUser);
-        userRepository.save(user);
 
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return userRepository.save(user);
     }
 
-    // Deletar usuário
-    public String deleteUser(@PathVariable long id){
-        userRepository.deleteById(id);
-        return "success";
+    // Verifica se existe usuário para det. documento
+    public Boolean existsUserByDocumentNumber(String documentNumber){
+        return userRepository.existsByDocumentNumber(documentNumber);
     }
+
+    // Verifica se existe usuário para det. id
+    public Boolean existUserById(long id){
+        return userRepository.existsById(id);
+    }
+
+    // Verifica se existe usuário para det. id
+    public Boolean existUserByEmail(String email){
+        return userRepository.existsByEmail(email);
+    }
+
+    // Busca saldos para det. documento
+    public BalanceResponse getBalanceByDocumentNumber(String documentNumber){
+        return userRepository.findBalanceByDocumentNumber(documentNumber);
+    }
+
 }

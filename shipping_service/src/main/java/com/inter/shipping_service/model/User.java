@@ -35,11 +35,6 @@ public class User {
     public User(UserDto user) {
         BeanUtils.copyProperties(user, this);
     }
-
-    public User(Double balanceReal, Double balanceDolar) {
-        this.balanceReal = balanceReal;
-        this.balanceDolar = balanceDolar;
-    }
-
-
 }
+
+

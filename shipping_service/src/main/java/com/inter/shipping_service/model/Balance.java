@@ -1,7 +1,6 @@
 package com.inter.shipping_service.model;
 
 import com.inter.shipping_service.dto.BalanceDto;
-import com.inter.shipping_service.dto.UserDto;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
@@ -34,3 +33,4 @@ public class Balance {
         BeanUtils.copyProperties(balance, this);
     }
 }
+
