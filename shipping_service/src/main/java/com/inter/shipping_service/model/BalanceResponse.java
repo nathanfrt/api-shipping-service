@@ -14,5 +14,5 @@ public class BalanceResponse {
     @Id
     private Long id;
     private Double balanceReal;
-    private Double balanceDolar;
+    private Double balanceDollar;
 }

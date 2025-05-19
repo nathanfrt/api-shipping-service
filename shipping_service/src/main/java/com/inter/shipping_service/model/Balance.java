@@ -1,9 +1,7 @@
 package com.inter.shipping_service.model;
 
 import com.inter.shipping_service.dto.BalanceDto;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,7 +16,9 @@ import java.time.LocalDateTime;
 @Table(name = "balance")
 public class Balance {
     @Id
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
+
     private Double amount;
     private TypeBalance typeBalance;
     private LocalDateTime createdAt;

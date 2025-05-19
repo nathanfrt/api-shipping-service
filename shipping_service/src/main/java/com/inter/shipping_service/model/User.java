@@ -29,8 +29,8 @@ public class User {
     @Enumerated(EnumType.STRING)
     private TypeUser type;
 
-    private Double balanceReal;
-    private Double balanceDolar;
+    private Double balanceReal = 0.00;
+    private Double balanceDollar = 0.00;
 
     public User(UserDto user) {
         BeanUtils.copyProperties(user, this);

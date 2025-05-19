@@ -2,14 +2,14 @@ package com.inter.shipping_service.service;
 
 import com.inter.shipping_service.dto.UserDto;
 import com.inter.shipping_service.exception.InvalidDocument;
+import com.inter.shipping_service.exception.NotExist;
 import com.inter.shipping_service.model.BalanceResponse;
 import com.inter.shipping_service.model.TypeUser;
 import com.inter.shipping_service.model.User;
 import com.inter.shipping_service.repository.UserRepository;
+import jakarta.persistence.Tuple;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
@@ -25,23 +25,23 @@ public class UserService {
     }
 
     // Buscar usuário por Id
-    public User getUserById(@PathVariable long id){
+    public User getUserById(long id){
         return userRepository.findById(id).orElse(null);
     }
 
     // Buscar usuário por documento
-    public User getUserByDocumentNumber(@PathVariable String documentNumber){
+    public User getUserByDocumentNumber(String documentNumber){
         return userRepository.findUserByDocumentNumber(documentNumber);
     }
 
     // Salvar usuário
-    public User saveUser(@RequestBody UserDto userDto){
+    public User saveUser(UserDto userDto){
         String document = userDto.documentNumber();
 
         if (document == null)
             throw new InvalidDocument("Invalid document number");;
 
-        document = userRepository.removenonNumericCharacters(document);
+        document = removeNonNumericCharacters(document);
         TypeUser typeUser = null;
 
         if(document.length() == 11) {
@@ -68,14 +68,41 @@ public class UserService {
         return userRepository.existsById(id);
     }
 
-    // Verifica se existe usuário para det. id
+    // Verifica se existe usuário para det. email
     public Boolean existUserByEmail(String email){
         return userRepository.existsByEmail(email);
     }
 
     // Busca saldos para det. documento
     public BalanceResponse getBalanceByDocumentNumber(String documentNumber){
+        exceptionDocumentNumber(documentNumber);
         return userRepository.findBalanceByDocumentNumber(documentNumber);
+    }
+
+    public Double getBalanceRealByDocumentNumber(String documentNumber){
+        exceptionDocumentNumber(documentNumber);
+        return userRepository.findBalanceRealByDocumentNumber(documentNumber);
+    }
+
+    public Double getBalanceDolarByDocumentNumber(String documentNumber){
+        exceptionDocumentNumber(documentNumber);
+        return userRepository.findBalanceDolarByDocumentNumber(documentNumber);
+    }
+
+    // Exibe exception caso não exista usuário para det. documento
+    public void exceptionDocumentNumber(String documentNumber){
+        if (!userRepository.existsByDocumentNumber(documentNumber)){
+            throw new NotExist("User not found");
+        }
+    }
+
+    public void save(User user) {
+        userRepository.save(user);
+    }
+
+    public String removeNonNumericCharacters(String text) {
+        if (text == null) { return null; }
+        return text.replaceAll("[^0-9]", "");
     }
 
 }

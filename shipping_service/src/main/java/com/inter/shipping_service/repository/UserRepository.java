@@ -7,14 +7,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.http.ResponseEntity;
 
 public interface UserRepository extends JpaRepository<User, Long> {
-
-    @Modifying
-    @Transactional
-    @Query("UPDATE User u SET u.balanceDolar = :balanceDolar WHERE u.documentNumber = :documentNumber")
-    void saveBalanceDolar (@Param("balanceDolar") Double balanceDolar, @Param("documentNumber") String documentNumber);
-
     @Modifying
     @Transactional
     @Query("UPDATE User u SET u.balanceReal = :balanceReal WHERE u.documentNumber = :documentNumber")
@@ -24,10 +19,13 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Boolean existsById(long id);
     Boolean existsByEmail(String email);
 
-    User findUserByDocumentNumber(String documentNumber);
-    BalanceResponse findBalanceByDocumentNumber(String documentNumber);
+    Double findBalanceDolarByDocumentNumber(String documentNumber);
+    Double findBalanceRealByDocumentNumber(String documentNumber);
 
-    String removenonNumericCharacters(String text);
+    User findUserByDocumentNumber(String documentNumber);
+
+    @Query("SELECT new BalanceResponse(u.id, u.balanceReal, u.balanceDollar) FROM User u WHERE u.documentNumber = :documentNumber")
+    BalanceResponse findBalanceByDocumentNumber(@Param("documentNumber") String documentNumber);
 
 
 }

@@ -4,6 +4,7 @@ import com.inter.shipping_service.dto.BalanceDto;
 import com.inter.shipping_service.exception.InvalidDocument;
 import com.inter.shipping_service.model.*;
 import com.inter.shipping_service.repository.BalanceRepository;
+import jakarta.persistence.Tuple;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,26 +29,16 @@ public class BalanceService {
         return balanceRepository.existsByDocumentNumber(documentNumber);
     }
 
-    // Verifica se existe tipo de moeda
-    public boolean existsTypeBalance(String typeBalance){
-        return balanceRepository.existsTypeBalance(typeBalance);
-    }
-
-    // Atualizar saldo
+    // Atualizar saldo em BRL
     public void updateBalance(BalanceDto balanceDto){
         if (!userService.existsUserByDocumentNumber(balanceDto.documentNumber()))
             throw new InvalidDocument("Invalid document number");;
 
         var user = userService.getUserByDocumentNumber(balanceDto.documentNumber());
-        Double balance = 0.0;
 
-        if (balanceDto.typeBalance() == TypeBalance.BR) {
-            balance += balanceDto.amount();
-            user.setBalanceReal(balance);
-        } else if (balanceDto.typeBalance() == TypeBalance.USD) {
-            balance += balanceDto.amount();
-            user.setBalanceDolar(balance);
-        }
+        Double balance = user.getBalanceReal() + balanceDto.amount();
+        user.setBalanceReal(balance);
+        userService.save(user);
 
         Balance newBalance = new Balance(balanceDto);
         newBalance.setCreatedAt(LocalDateTime.now());
