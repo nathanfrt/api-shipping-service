@@ -3,14 +3,13 @@ package com.inter.shipping_service.model;
 import com.inter.shipping_service.dto.BalanceDto;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.BeanUtils;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
@@ -20,17 +19,14 @@ import java.util.Date;
 public class Balance {
     @Id
     private Long id;
-    private Double balance;
-    private Double quotation;
+    private Double amount;
     private TypeBalance typeBalance;
-    private Date updatedAt;
+    private LocalDateTime createdAt;
     private String documentNumber;
-
-    @ManyToOne
-    private User user;
 
     public Balance(BalanceDto balance){
         BeanUtils.copyProperties(balance, this);
     }
+
 }
 

@@ -1,7 +1,7 @@
 package com.inter.shipping_service.service;
 
 import com.inter.shipping_service.dto.UserDto;
-import com.inter.shipping_service.exception.PfPjException;
+import com.inter.shipping_service.exception.InvalidDocument;
 import com.inter.shipping_service.model.BalanceResponse;
 import com.inter.shipping_service.model.TypeUser;
 import com.inter.shipping_service.model.User;
@@ -36,17 +36,21 @@ public class UserService {
 
     // Salvar usuário
     public User saveUser(@RequestBody UserDto userDto){
-
         String document = userDto.documentNumber();
+
+        if (document == null)
+            throw new InvalidDocument("Invalid document number");;
+
+        document = userRepository.removenonNumericCharacters(document);
         TypeUser typeUser = null;
 
-        if(document != null && document.length() == 11) {
+        if(document.length() == 11) {
             typeUser = TypeUser.PF;
         }
-        else if(document != null && document.length() == 14) {
+        else if(document.length() == 14) {
             typeUser = TypeUser.PJ;
         }
-        else throw new PfPjException("CPF inválido");
+        else throw new InvalidDocument("Invalid document number");
 
         User user = new User(userDto);
         user.setType(typeUser);

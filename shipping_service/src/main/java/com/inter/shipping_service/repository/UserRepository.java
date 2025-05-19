@@ -25,8 +25,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Boolean existsByEmail(String email);
 
     User findUserByDocumentNumber(String documentNumber);
-
     BalanceResponse findBalanceByDocumentNumber(String documentNumber);
+
+    String removenonNumericCharacters(String text);
 
 
 }

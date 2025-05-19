@@ -40,4 +40,5 @@ public class BalanceController {
 
         return ResponseEntity.status(HttpStatus.OK).body("Value updated.");
     }
+
 }

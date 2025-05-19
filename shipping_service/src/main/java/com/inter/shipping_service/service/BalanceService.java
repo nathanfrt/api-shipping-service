@@ -1,10 +1,13 @@
 package com.inter.shipping_service.service;
 
 import com.inter.shipping_service.dto.BalanceDto;
+import com.inter.shipping_service.exception.InvalidDocument;
 import com.inter.shipping_service.model.*;
 import com.inter.shipping_service.repository.BalanceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 
 @Service
 public class BalanceService {
@@ -31,9 +34,9 @@ public class BalanceService {
     }
 
     // Atualizar saldo
-    public String updateBalance(BalanceDto balanceDto){
+    public void updateBalance(BalanceDto balanceDto){
         if (!userService.existsUserByDocumentNumber(balanceDto.documentNumber()))
-            return "not exist";
+            throw new InvalidDocument("Invalid document number");;
 
         var user = userService.getUserByDocumentNumber(balanceDto.documentNumber());
         Double balance = 0.0;
@@ -45,7 +48,10 @@ public class BalanceService {
             balance += balanceDto.amount();
             user.setBalanceDolar(balance);
         }
-        return "success";
+
+        Balance newBalance = new Balance(balanceDto);
+        newBalance.setCreatedAt(LocalDateTime.now());
+        balanceRepository.save(newBalance);
     }
 
 }
