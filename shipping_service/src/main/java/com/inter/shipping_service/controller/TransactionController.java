@@ -21,7 +21,7 @@ public class TransactionController {
     @Autowired
     private UserService userService;
 
-    @GetMapping("/by/{documentNumber}")
+    @GetMapping("/by")
     public ResponseEntity<?> getTransactionByDocumentNumber(@RequestParam @Valid String documentNumber){
         try {
             userService.exceptionDocumentNumber(documentNumber);
@@ -34,7 +34,7 @@ public class TransactionController {
         }
     }
 
-    @GetMapping("/to/{documentNumber}")
+    @GetMapping("/to")
     public ResponseEntity<?> getTransactionToDocumentNumber(@RequestParam @Valid String documentNumber){
         try {
             userService.exceptionDocumentNumber(documentNumber);

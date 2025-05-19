@@ -25,7 +25,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(users);
     }
 
-    @GetMapping(value = "/id/{id}/")
+    @GetMapping(value = "/id")
     public ResponseEntity<?> getUserById(@RequestParam long id){
         if (!userService.existUserById(id)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User not found");
@@ -34,7 +34,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(user);
     }
 
-    @GetMapping(value = "/documentNumber/{documentNumber}/")
+    @GetMapping(value = "/documentNumber")
     public ResponseEntity<?> getBalanceByDocumentNumber(@RequestParam String documentNumber){
         if (!userService.existsUserByDocumentNumber(documentNumber)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User not found");

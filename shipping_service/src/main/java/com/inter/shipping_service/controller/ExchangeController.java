@@ -16,8 +16,8 @@ public class ExchangeController {
     @Autowired
     private ExchangeService exchangeService;
 
-    @GetMapping("/quote/{date}/")
-    public ResponseEntity<?> olindaAPI_External(@PathVariable String date){
+    @GetMapping("/quote")
+    public ResponseEntity<?> olindaAPI_External(@RequestParam String date){
         try {
             double result = exchangeService.getQuote_External(date);
             if (result > 0){
@@ -30,7 +30,7 @@ public class ExchangeController {
         }
     }
 
-    @PostMapping("/convert/realToDollar/{documentNumber}/{amountReal}")
+    @PostMapping("/convert/realToDollar")
     public ResponseEntity<?> postTransaction(@RequestParam @Valid String documentNumber, @RequestParam @Valid Double amountReal) {
         var quote = exchangeService.getQuote_External(LocalDateTime.now().toString());
         var converts = exchangeService.conversionCurrency(documentNumber, amountReal, quote);
