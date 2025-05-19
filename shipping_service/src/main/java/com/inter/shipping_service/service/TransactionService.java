@@ -30,20 +30,20 @@ public class TransactionService {
     public List<Transaction> getTransactionsByUser(String documentNumber){
         userService.exceptionDocumentNumber(documentNumber);
 
-        if (!transactionRepository.existsTransactionByDocumentNumber(documentNumber)){
+        if (!transactionRepository.existsByTransactionBy(documentNumber)){
             throw new NotExist("Transaction not found by user");
         }
-        return transactionRepository.findAllTransactionByDocumentNumber(documentNumber);
+        return transactionRepository.findAllByTransactionBy(documentNumber);
     }
 
     // Obtem as transações feitas para det. usuário
     public List<Transaction> getTransactionsToUser(String documentNumber){
         userService.exceptionDocumentNumber(documentNumber);
 
-        if (!transactionRepository.existsTransactionToDocumentNumber(documentNumber)){
+        if (!transactionRepository.existsByTransactionTo(documentNumber)){
             throw new NotExist("Transaction not found to user");
         }
-        return transactionRepository.findAllTransactionToDocumentNumber(documentNumber);
+        return transactionRepository.findAllByTransactionTo(documentNumber);
     }
 
     @Transactional

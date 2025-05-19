@@ -47,7 +47,7 @@ public class TransactionController {
         }
     }
 
-    @PostMapping("/convert/real/{documentNumber}/{amountReal}")
+    @PostMapping("/convert/real")
     public ResponseEntity<?> postTransactionRealToReal(@RequestBody @Valid TransactionDto transactionDto) {
         try {
             var transaction = transactionService.transactionBRLToBRL(transactionDto);
@@ -62,7 +62,7 @@ public class TransactionController {
         }
     }
 
-    @PostMapping("/convert/dollar/{documentNumber}/{amountReal}")
+    @PostMapping("/convert/dollar")
     public ResponseEntity<?> postTransactionDollarToDollar(@RequestBody @Valid TransactionDto transactionDto) {
         try {
             var transaction = transactionService.transactionUSAToUSA(transactionDto);

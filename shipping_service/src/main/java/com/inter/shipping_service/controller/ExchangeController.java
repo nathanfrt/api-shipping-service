@@ -31,7 +31,7 @@ public class ExchangeController {
     }
 
     @PostMapping("/convert/realToDollar/{documentNumber}/{amountReal}")
-    public ResponseEntity<?> postTransaction(@RequestBody @Valid String documentNumber, Double amountReal) {
+    public ResponseEntity<?> postTransaction(@RequestParam @Valid String documentNumber, @RequestParam @Valid Double amountReal) {
         var quote = exchangeService.getQuote_External(LocalDateTime.now().toString());
         var converts = exchangeService.conversionCurrency(documentNumber, amountReal, quote);
 
