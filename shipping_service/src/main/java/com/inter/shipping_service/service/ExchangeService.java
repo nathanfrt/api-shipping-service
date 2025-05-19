@@ -2,9 +2,16 @@ package com.inter.shipping_service.service;
 
 import com.inter.shipping_service.dto.ExchangeDto;
 import com.inter.shipping_service.exception.InsufficientBalance;
+import com.inter.shipping_service.exception.NotExist;
 import com.inter.shipping_service.model.Exchange;
+import com.inter.shipping_service.model.OlindaResponse;
+import com.inter.shipping_service.model.Value;
 import com.inter.shipping_service.repository.ExchangeRepository;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -17,28 +24,23 @@ public class ExchangeService {
     private ExchangeRepository exchangeRepository;
     private UserService userService;
 
-    // Conversão de dolar para Real
-    public Exchange conversionCurrency(ExchangeDto exchangeDto, Double quote){
-        userService.exceptionDocumentNumber(exchangeDto.documentNumber());
+    // Conversão de dollar para Real
+    public Double conversionCurrency(String documentNumber, Double amount, Double quote){
+        userService.exceptionDocumentNumber(documentNumber);
 
-        if (!existsBalanceToTransactionUSD(exchangeDto.documentNumber(),exchangeDto.amount(), quote)){
+        if (!existsBalanceToTransactionUSD(documentNumber,amount, quote)){
             throw new InsufficientBalance("Insufficient balance");
         }
 
-        var balance = userService.getBalanceRealByDocumentNumber(exchangeDto.documentNumber());
+        var balance = userService.getBalanceRealByDocumentNumber(documentNumber);
         Double transferAmount = balance / quote;
 
-        var user = userService.getUserByDocumentNumber(exchangeDto.documentNumber());
+        var user = userService.getUserByDocumentNumber(documentNumber);
         user.setBalanceReal(user.getBalanceReal() - transferAmount);
-        user.setBalanceDollar(user.getBalanceDollar() + exchangeDto.amount());
+        user.setBalanceDollar(user.getBalanceDollar() + amount);
         userService.save(user);
 
-        Exchange exchange = new Exchange(exchangeDto);
-        exchange.setTotal(transferAmount);
-        exchange.setQuote(quote);
-        exchange.setCreatedAt(LocalDateTime.now());
-
-        return exchangeRepository.save(exchange);
+        return transferAmount;
     }
 
     // Verifica se existe valor para transf. USD
@@ -47,6 +49,7 @@ public class ExchangeService {
         return (balance / quote) >= amount;
     }
 
+    // Formata data dentro do padrão desejado
     public String formatDate(String date){
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd-yyyy");
         LocalDate data = LocalDate.parse(date, formatter);
@@ -57,4 +60,25 @@ public class ExchangeService {
         return formatter.format(data);
     }
 
+    public Double getQuote_External(String date){
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            var dateFormat = formatDate(date);
+
+            String url = "https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata/" +
+                    "CotacaoDolarDia(dataCotacao=@dataCotacao)?@dataCotacao='" + dateFormat + "'&$format=json";
+
+            ResponseEntity<OlindaResponse> response = restTemplate.getForEntity(url, OlindaResponse.class);
+            OlindaResponse body = response.getBody();
+
+            if (body != null && body.getValue() != null && !body.getValue().isEmpty()) {
+                Value quote = body.getValue().getFirst();
+                return quote.getCotacaoCompra();
+            }
+            throw new NotExist("Quote not found");
+
+        } catch (Exception e) {
+            throw new NotExist("Error when checking quote: " + e.getMessage());
+        }
+    }
 }
