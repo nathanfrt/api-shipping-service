@@ -74,7 +74,7 @@ class UserServiceTest {
 
     @Test
     void saveUser_PF_Success() {
-        UserDto userDto = new UserDto("Inter", "123@Inter", "joao@test.com", docPF, TypeUser.PF,100.00, 50.00);
+        UserDto userDto = new UserDto("Inter", "123@Inter", "joao@test.com", docPF);
 
         when(userRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -86,7 +86,7 @@ class UserServiceTest {
 
     @Test
     void saveUser_PJ_Success() {
-        UserDto userDto = new UserDto("Inter", "123@Inter", "joao@test.com", docPJ, TypeUser.PJ,100.00, 50.00);
+        UserDto userDto = new UserDto("Inter", "123@Inter", "joao@test.com", docPJ);
 
         when(userRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 

@@ -79,7 +79,7 @@ public class TransactionController {
             return ResponseEntity.status(HttpStatus.CREATED).body(transaction);
         }
         catch (Exception e) {
-            throw new RuntimeException(e);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 

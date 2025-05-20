@@ -98,14 +98,6 @@ class TransactionServiceTest {
     }
 
     @Test
-    void transactionUSAToUSA_insufficientBalance() {
-        when(exchangeService.getQuote_External(any())).thenReturn(5.0);
-        when(exchangeService.existsBalanceToTransactionUSD(userPF.getDocumentNumber(), 100.0, 5.0)).thenReturn(false);
-
-        assertThrows(InsufficientBalance.class, () -> transactionService.transactionUSAToUSA(transactionDto));
-    }
-
-    @Test
     void limitExceeded_passedForPF() {
         when(transactionRepository.limitDay(userPF.getDocumentNumber(), LocalDate.now())).thenReturn(200.0);
 

@@ -48,22 +48,6 @@ class ExchangeServiceTest {
     }
 
     @Test
-    void existsBalanceToTransactionUSD_True_WhenSufficient() {
-        when(userService.getBalanceDollarByDocumentNumber(doc)).thenReturn(100.0);
-
-        boolean result = exchangeService.existsBalanceToTransactionUSD(doc, 10.0, 5.0);
-        assertTrue(result);
-    }
-
-    @Test
-    void existsBalanceToTransactionUSD_False_WhenInsufficient() {
-        when(userService.getBalanceDollarByDocumentNumber(doc)).thenReturn(20.0);
-
-        boolean result = exchangeService.existsBalanceToTransactionUSD(doc, 10.0, 5.0);
-        assertFalse(result);
-    }
-
-    @Test
     void formatDate_IfWeekday_ShouldReturnSameDateFormatted() {
         LocalDate weekday = LocalDate.of(2025, 5, 14); // quarta-feira
         String formatted = exchangeService.formatDate(weekday);

@@ -133,7 +133,7 @@ class UserRepositoryTest {
         assertThat(balance).isNull();
     }
 
-    private static final UserDto MOCK_DTO = new UserDto("Inter PF", "Inter@2025-", "teste@inter.com", "82724875001", TypeUser.PF, 150.00, 180.00);
+    private static final UserDto MOCK_DTO = new UserDto("Inter PF", "Inter@2025-", "teste@inter.com", "82724875001");
 
     private User persistUser(UserDto dto) {
         User user = new User(dto);

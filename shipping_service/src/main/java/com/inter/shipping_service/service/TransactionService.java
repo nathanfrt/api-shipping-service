@@ -56,7 +56,7 @@ public class TransactionService {
         var quote = exchangeService.getQuote_External(LocalDate.now());
         var conversion = exchangeService.conversionCurrency(transactionDto.transactionBy(), transactionDto.amount(), quote);
 
-        Double limitDay = limitExceeded(transactionDto.transactionBy(), transactionDto.amount());
+        Double limitDay = limitExceeded(transactionDto.transactionBy(), transactionDto.amount() + quote);
 
         if (limitDay <= 0.1) {
             cancelledTransaction(transactionDto.transactionBy(), conversion);
@@ -85,13 +85,18 @@ public class TransactionService {
         return userService.getBalanceRealByDocumentNumber(documentNumber) >= amount;
     }
 
+    // Verifica se existe valor para trasnf. USA
+    public Boolean existsBalanceToTransactionUSA(String documentNumber, Double amount){
+        return userService.getBalanceDollarByDocumentNumber(documentNumber) >= amount;
+    }
+
     @Transactional
     public Transaction transactionUSAToUSA(TransactionDto transactionDto){
         var quote = exchangeService.getQuote_External(LocalDate.now());
-        if (!exchangeService.existsBalanceToTransactionUSD(transactionDto.transactionBy(),transactionDto.amount(), quote)) {
+        if (!existsBalanceToTransactionUSA(transactionDto.transactionBy(),transactionDto.amount())) {
             throw new InsufficientBalance("Insufficient balance");
         }
-        return transactionBank(transactionDto, "USA", quote, false);
+        return transactionBank(transactionDto, "USD", quote, false);
     }
 
 
@@ -99,15 +104,16 @@ public class TransactionService {
     @Transactional
     public Transaction transactionBank(TransactionDto transactionDto, String typeBalance, Double quote, Boolean isConvertion){
         boolean equals = Objects.equals(transactionDto.transactionBy(), transactionDto.transactionTo());
-        if ((!isConvertion && equals) ||
-                ((isConvertion && !equals))){
+        if ((!isConvertion && equals) || ((isConvertion && !equals))){
             throw new InsufficientBalance("Transaction not permitted");
         }
 
         var send = userService.getUserByDocumentNumber(transactionDto.transactionBy());
         var receiver = userService.getUserByDocumentNumber(transactionDto.transactionTo());
 
-        Double limitDay = limitExceeded(transactionDto.transactionBy(), transactionDto.amount());
+        Double amount = typeBalance.equals("USD") ? transactionDto.amount() * quote : transactionDto.amount();
+
+        Double limitDay = limitExceeded(transactionDto.transactionBy(), amount);
 
         if (typeBalance.equals("BRL")) {
             var balanceTo = userService.getBalanceRealByDocumentNumber(transactionDto.transactionTo());

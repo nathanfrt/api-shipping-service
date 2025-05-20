@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -27,22 +29,19 @@ public class ExchangeService {
         userService.exceptionDocumentNumber(documentNumber);
 
         var balanceReal = userService.getBalanceRealByDocumentNumber(documentNumber);
-        Double transferAmount = balanceReal / quote;
+
+        Double transferAmount = BigDecimal.valueOf(amount / quote)
+                .setScale(2, RoundingMode.HALF_UP)
+                .doubleValue();
 
         var user = userService.getUserByDocumentNumber(documentNumber);
         Double balanceDollar = userService.getBalanceDollarByDocumentNumber(documentNumber);
 
-        user.setBalanceReal(balanceReal - transferAmount);
-        user.setBalanceDollar(balanceDollar + amount);
+        user.setBalanceReal(balanceReal - amount);
+        user.setBalanceDollar(balanceDollar + transferAmount);
         userService.save(user);
 
         return transferAmount;
-    }
-
-    // Verifica se existe valor para transf. USD
-    public Boolean existsBalanceToTransactionUSD(String documentNumber, Double amount, Double quote){
-        Double balance = userService.getBalanceDollarByDocumentNumber(documentNumber);
-        return (balance / quote) >= amount;
     }
 
     // Formata data dentro do padrão desejado
@@ -69,7 +68,13 @@ public class ExchangeService {
 
             if (body != null && body.getValue() != null && !body.getValue().isEmpty()) {
                 Value quote = body.getValue().getFirst();
-                return quote.getCotacaoCompra();
+                Double rawValue = quote.getCotacaoCompra();
+
+                Double roundedValue = BigDecimal.valueOf(rawValue)
+                        .setScale(2, RoundingMode.HALF_UP)
+                        .doubleValue();
+
+                return roundedValue;
             }
             throw new NotExist("Quote not found");
 

@@ -10,6 +10,8 @@ import com.inter.shipping_service.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.Optional;
 
@@ -100,7 +102,16 @@ public class UserService {
 
     // Salva usuário
     public void save(User user) {
+        user.setBalanceDollar(formatCurrency(user.getBalanceDollar()));
+        user.setBalanceReal(formatCurrency(user.getBalanceReal()));
         userRepository.save(user);
+    }
+
+    // Format Moeda
+    public Double formatCurrency(Double amount){
+        return BigDecimal.valueOf(amount)
+                .setScale(2, RoundingMode.HALF_UP)
+                .doubleValue();
     }
 
     // Permite apenas números
