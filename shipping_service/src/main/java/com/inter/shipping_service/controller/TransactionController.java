@@ -5,6 +5,8 @@ import com.inter.shipping_service.exception.TransactionFail;
 import com.inter.shipping_service.model.Transaction;
 import com.inter.shipping_service.service.TransactionService;
 import com.inter.shipping_service.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/transaction")
+@Tag(name = "Transações/Transferências bancárias", description = "Controlador para obter e realizar transações entre usuários")
 public class TransactionController {
 
     @Autowired
@@ -21,6 +24,7 @@ public class TransactionController {
     private UserService userService;
 
     @GetMapping("/by")
+    @Operation(summary = "Obter transações pelo usuário indicado")
     public ResponseEntity<?> getTransactionByDocumentNumber(@RequestParam @Valid String documentNumber){
         try {
             userService.exceptionDocumentNumber(documentNumber);
@@ -34,6 +38,7 @@ public class TransactionController {
     }
 
     @GetMapping("/to")
+    @Operation(summary = "Obter transações para o usuário indicado")
     public ResponseEntity<?> getTransactionToDocumentNumber(@RequestParam @Valid String documentNumber){
         try {
             userService.exceptionDocumentNumber(documentNumber);
@@ -46,7 +51,8 @@ public class TransactionController {
         }
     }
 
-    @PostMapping("/convert/real")
+    @PostMapping("/real")
+    @Operation(summary = "Transferir de BRL para BRL")
     public ResponseEntity<?> postTransactionRealToReal(@RequestBody @Valid TransactionDto transactionDto) {
         try {
             var transaction = transactionService.transactionBRLToBRL(transactionDto);
@@ -61,7 +67,8 @@ public class TransactionController {
         }
     }
 
-    @PostMapping("/convert/dollar")
+    @PostMapping("/dollar")
+    @Operation(summary = "Transferir de USD para USD")
     public ResponseEntity<?> postTransactionDollarToDollar(@RequestBody @Valid TransactionDto transactionDto) {
         try {
             var transaction = transactionService.transactionUSAToUSA(transactionDto);
@@ -76,7 +83,8 @@ public class TransactionController {
         }
     }
 
-    @PostMapping("/convert/remessa")
+    @PostMapping("/remessa")
+    @Operation(summary = "Realizar remessa online", description = "Converte o valor da conta de transactionTo de BRL para USD e transfere o valor USD convertido")
     public ResponseEntity<?> postTransaction(@RequestBody @Valid TransactionDto transactionDto){
         try {
             Transaction transaction = transactionService.postRemessaService(transactionDto);

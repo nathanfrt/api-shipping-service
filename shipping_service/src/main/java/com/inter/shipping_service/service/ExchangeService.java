@@ -45,17 +45,17 @@ public class ExchangeService {
     }
 
     // Formata data dentro do padrão desejado
-    public String formatDate(String date){
+    public String formatDate(LocalDate date){
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd-yyyy");
-        LocalDate data = LocalDate.parse(date, formatter);
 
-        while (data.getDayOfWeek() == DayOfWeek.SATURDAY || data.getDayOfWeek() == DayOfWeek.SUNDAY) {
-            data = data.minusDays(1);
+        while (date.getDayOfWeek() == DayOfWeek.SATURDAY || date.getDayOfWeek() == DayOfWeek.SUNDAY) {
+            date = date.minusDays(1);
         }
-        return formatter.format(data);
+
+        return formatter.format(date);
     }
 
-    public Double getQuote_External(String date){
+    public Double getQuote_External(LocalDate date){
         try {
             RestTemplate restTemplate = new RestTemplate();
             var dateFormat = formatDate(date);

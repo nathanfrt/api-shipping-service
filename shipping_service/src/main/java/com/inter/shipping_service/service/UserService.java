@@ -7,7 +7,6 @@ import com.inter.shipping_service.model.BalanceResponse;
 import com.inter.shipping_service.model.TypeUser;
 import com.inter.shipping_service.model.User;
 import com.inter.shipping_service.repository.UserRepository;
-import jakarta.persistence.Tuple;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

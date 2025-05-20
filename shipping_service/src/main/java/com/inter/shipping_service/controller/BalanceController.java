@@ -3,6 +3,9 @@ package com.inter.shipping_service.controller;
 import com.inter.shipping_service.dto.BalanceDto;
 import com.inter.shipping_service.service.BalanceService;
 import com.inter.shipping_service.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.persistence.Table;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/balance")
+@Tag(name = "Saldo Bancário", description = "Controlador para salvar e consultar saldo por usuário")
 public class BalanceController {
 
     @Autowired
@@ -19,6 +23,7 @@ public class BalanceController {
     private UserService userService;
 
     @GetMapping("/document")
+    @Operation(summary = "Consultar saldo por documento")
     public ResponseEntity<?> getBalancebyDocumentNumber(@RequestParam String documentNumber) {
         try {
             if (!userService.existsUserByDocumentNumber(documentNumber)) {
@@ -33,6 +38,7 @@ public class BalanceController {
     }
 
     @PutMapping()
+    @Operation(summary = "Atualizar saldo BRL por documento")
     public ResponseEntity<?> putBalance(@RequestBody @Valid BalanceDto balanceDto){
         try{
         if (!userService.existsUserByDocumentNumber(balanceDto.documentNumber())){

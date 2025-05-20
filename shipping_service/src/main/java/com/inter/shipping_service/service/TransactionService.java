@@ -5,7 +5,6 @@ import com.inter.shipping_service.exception.InsufficientBalance;
 import com.inter.shipping_service.exception.NotExist;
 import com.inter.shipping_service.exception.TransactionFail;
 import com.inter.shipping_service.model.Transaction;
-import com.inter.shipping_service.model.TypeBalance;
 import com.inter.shipping_service.model.TypeUser;
 import com.inter.shipping_service.repository.TransactionRepository;
 import jakarta.transaction.Transactional;
@@ -54,7 +53,7 @@ public class TransactionService {
         userService.exceptionDocumentNumber(transactionDto.transactionTo());
         userService.exceptionDocumentNumber(transactionDto.transactionBy());
 
-        var quote = exchangeService.getQuote_External(LocalDateTime.now().toString());
+        var quote = exchangeService.getQuote_External(LocalDate.now());
         var conversion = exchangeService.conversionCurrency(transactionDto.transactionBy(), transactionDto.amount(), quote);
 
         limitExceeded(transactionDto.transactionBy(), transactionDto.amount());
@@ -89,7 +88,7 @@ public class TransactionService {
 
     @Transactional
     public Transaction transactionUSAToUSA(TransactionDto transactionDto){
-        var quote = exchangeService.getQuote_External(LocalDateTime.now().toString());
+        var quote = exchangeService.getQuote_External(LocalDate.now());
         if (!exchangeService.existsBalanceToTransactionUSD(transactionDto.transactionBy(),transactionDto.amount(), quote)) {
             throw new InsufficientBalance("Insufficient balance");
         }

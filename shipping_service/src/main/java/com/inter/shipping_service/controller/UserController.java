@@ -2,6 +2,8 @@ package com.inter.shipping_service.controller;
 
 import com.inter.shipping_service.dto.UserDto;
 import com.inter.shipping_service.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -10,12 +12,14 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/user")
+@Tag(name = "Usuário", description = "Controlador para cadastrar e consultar usuários")
 public class UserController {
 
     @Autowired
     private UserService userService;
 
     @GetMapping(value = "/all/")
+    @Operation(summary = "Obter lista de todos os usuários cadastrados")
     public ResponseEntity<?> users(){
         try {
             var users = userService.getUsers();
@@ -31,6 +35,7 @@ public class UserController {
     }
 
     @GetMapping(value = "/id")
+    @Operation(summary = "Obter usuário cadastrado pelo ID")
     public ResponseEntity<?> getUserById(@RequestParam long id){
         try {
             if (!userService.existUserById(id)) {
@@ -45,6 +50,7 @@ public class UserController {
     }
 
     @GetMapping(value = "/documentNumber")
+    @Operation(summary = "Obter usuário cadastrado pelo Document Number (número de documento)")
     public ResponseEntity<?> getBalanceByDocumentNumber(@RequestParam String documentNumber){
         try {
             if (!userService.existsUserByDocumentNumber(documentNumber)) {
@@ -59,6 +65,7 @@ public class UserController {
     }
 
     @PostMapping(value = "/create/")
+    @Operation(summary = "Cadastrar usuário")
     public ResponseEntity<?> postUser(@RequestBody @Valid UserDto userDto){
         try {
             if (userService.existsUserByDocumentNumber(userDto.documentNumber())) {
