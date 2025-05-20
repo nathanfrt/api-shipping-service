@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.BeanUtils;
+import org.springframework.format.annotation.NumberFormat;
 
 import java.time.LocalDateTime;
 
@@ -19,7 +20,9 @@ public class Balance {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
+    @NumberFormat(pattern = "#0.00")
     private Double amount;
+
     private TypeBalance typeBalance;
     private LocalDateTime createdAt;
     private String documentNumber;

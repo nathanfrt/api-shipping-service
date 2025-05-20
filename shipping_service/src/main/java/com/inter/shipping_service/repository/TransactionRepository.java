@@ -16,7 +16,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
     List<Transaction> findAllByTransactionBy(String transactionBy);
     List<Transaction> findAllByTransactionTo(String transactionTo);
 
-    @Query("SELECT COALESCE(SUM(t.limitDay), 0) FROM Transaction t WHERE t.transactionBy = :documentNumber AND t.createdAt = :dateTransaction")
+    @Query("SELECT COALESCE(SUM(t.limitUsed), 0) FROM Transaction t WHERE t.transactionBy = :documentNumber AND t.createdAt = :dateTransaction")
     Double limitDay(@Param("documentNumber") String documentNumber, @Param("dateTransaction") LocalDate dateTransaction);
 
 }

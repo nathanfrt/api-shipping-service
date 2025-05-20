@@ -2,13 +2,13 @@ package com.inter.shipping_service.model;
 
 import com.inter.shipping_service.dto.TransactionDto;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.BeanUtils;
+import org.springframework.format.annotation.NumberFormat;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Data
@@ -21,15 +21,21 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    @NumberFormat(pattern = "#0.00")
     private Double amount;
+
+    @NumberFormat(pattern = "#0.00")
     private Double quote;
+
+    @NumberFormat(pattern = "#0.00")
     private Double conversionAmount;
 
     private String transactionBy;
     private String transactionTo;
 
-    private LocalDateTime createdAt;
+    private LocalDate createdAt;
     private Double limitDay;
+    private Double limitUsed;
 
     public Transaction(TransactionDto transactionDto) {
         BeanUtils.copyProperties(transactionDto, this);

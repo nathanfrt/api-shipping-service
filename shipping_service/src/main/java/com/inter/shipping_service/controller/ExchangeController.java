@@ -10,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 @RestController
@@ -49,7 +48,7 @@ public class ExchangeController {
             if (converts == null || converts < 0.01) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Convert fail.");
             }
-            return ResponseEntity.status(HttpStatus.CREATED).body("Value converted.");
+            return ResponseEntity.status(HttpStatus.CREATED).body("Value converted: " + converts);
         }
         catch (Exception e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());

@@ -18,16 +18,6 @@ public class BalanceService {
     @Autowired
     private UserService userService;
 
-    // Buscar saldos por Documento
-    public BalanceResponse getBalanceByDocument(String documentNumber){
-        return userService.getBalanceByDocumentNumber(documentNumber);
-    }
-
-    // Verifica se existe transações por documento
-    public Boolean existsBalanceByDocumentNumber(String documentNumber){
-        return balanceRepository.existsByDocumentNumber(documentNumber);
-    }
-
     // Atualizar saldo em BRL
     public void updateBalance(BalanceDto balanceDto){
         if (!userService.existsUserByDocumentNumber(balanceDto.documentNumber()))

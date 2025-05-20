@@ -5,6 +5,7 @@ import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.NumberFormat;
 
 @Data
 @AllArgsConstructor
@@ -13,6 +14,10 @@ import lombok.NoArgsConstructor;
 public class BalanceResponse {
     @Id
     private Long id;
+
+    @NumberFormat(pattern = "#0.00")
     private Double balanceReal;
+
+    @NumberFormat(pattern = "#0.00")
     private Double balanceDollar;
 }

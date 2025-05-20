@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.BeanUtils;
+import org.springframework.format.annotation.NumberFormat;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -21,8 +22,13 @@ public class Exchange {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private UUID id;
 
+    @NumberFormat(pattern = "#0.00")
     private Double amount;
+
+    @NumberFormat(pattern = "#0.00")
     private Double quote;
+
+    @NumberFormat(pattern = "#0.00")
     private Double total;
 
     private LocalDateTime createdAt;

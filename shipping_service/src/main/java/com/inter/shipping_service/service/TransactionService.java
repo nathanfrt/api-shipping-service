@@ -6,13 +6,13 @@ import com.inter.shipping_service.exception.NotExist;
 import com.inter.shipping_service.exception.TransactionFail;
 import com.inter.shipping_service.model.Transaction;
 import com.inter.shipping_service.model.TypeUser;
+import com.inter.shipping_service.model.User;
 import com.inter.shipping_service.repository.TransactionRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -56,14 +56,14 @@ public class TransactionService {
         var quote = exchangeService.getQuote_External(LocalDate.now());
         var conversion = exchangeService.conversionCurrency(transactionDto.transactionBy(), transactionDto.amount(), quote);
 
-        limitExceeded(transactionDto.transactionBy(), transactionDto.amount());
+        Double limitDay = limitExceeded(transactionDto.transactionBy(), transactionDto.amount());
 
-        if (!exchangeService.existsBalanceToTransactionUSD(transactionDto.transactionBy(), transactionDto.amount(), quote)) {
+        if (limitDay <= 0.1) {
             cancelledTransaction(transactionDto.transactionBy(), conversion);
             throw new InsufficientBalance("Insufficient balance");
         }
 
-        return transactionBank(transactionDto, "USD");
+        return transactionBank(transactionDto, "USD", quote, true);
     }
 
     public void cancelledTransaction(String documentNumber, Double reversal){
@@ -77,8 +77,7 @@ public class TransactionService {
         if (!existsBalanceToTransactionBR(transactionDto.transactionBy(),transactionDto.amount())) {
             throw new InsufficientBalance("Insufficient balance");
         }
-        limitExceeded(transactionDto.transactionBy(), transactionDto.amount());
-        return transactionBank(transactionDto, "BRL");
+        return transactionBank(transactionDto, "BRL", 0.0,false);
     }
 
     // Verifica se existe valor para trasnf. BR
@@ -92,30 +91,37 @@ public class TransactionService {
         if (!exchangeService.existsBalanceToTransactionUSD(transactionDto.transactionBy(),transactionDto.amount(), quote)) {
             throw new InsufficientBalance("Insufficient balance");
         }
-        limitExceeded(transactionDto.transactionBy(), transactionDto.amount());
-        return transactionBank(transactionDto, "USA");
+        return transactionBank(transactionDto, "USA", quote, false);
     }
 
 
     // Transferência bancária
     @Transactional
-    public Transaction transactionBank(TransactionDto transactionDto, String typeBalance){
-        if (Objects.equals(transactionDto.transactionBy(), transactionDto.transactionTo())){
+    public Transaction transactionBank(TransactionDto transactionDto, String typeBalance, Double quote, Boolean isConvertion){
+        boolean equals = Objects.equals(transactionDto.transactionBy(), transactionDto.transactionTo());
+        if ((!isConvertion && equals) ||
+                ((isConvertion && !equals))){
             throw new InsufficientBalance("Transaction not permitted");
         }
 
         var send = userService.getUserByDocumentNumber(transactionDto.transactionBy());
         var receiver = userService.getUserByDocumentNumber(transactionDto.transactionTo());
 
-        limitExceeded(transactionDto.transactionBy(), transactionDto.amount());
+        Double limitDay = limitExceeded(transactionDto.transactionBy(), transactionDto.amount());
 
         if (typeBalance.equals("BRL")) {
-            send.setBalanceReal(send.getBalanceReal() - transactionDto.amount());
-            receiver.setBalanceReal(receiver.getBalanceReal() + transactionDto.amount());
+            var balanceTo = userService.getBalanceRealByDocumentNumber(transactionDto.transactionTo());
+            var balanceBy = userService.getBalanceRealByDocumentNumber(transactionDto.transactionBy());
+
+            send.setBalanceReal(balanceBy - transactionDto.amount());
+            receiver.setBalanceReal(balanceTo + transactionDto.amount());
         }
         else if (typeBalance.equals("USD")) {
-            send.setBalanceDollar(send.getBalanceDollar() - transactionDto.amount());
-            receiver.setBalanceDollar(receiver.getBalanceDollar() + transactionDto.amount());
+            var balanceTo = userService.getBalanceDollarByDocumentNumber(transactionDto.transactionTo());
+            var balanceBy = userService.getBalanceDollarByDocumentNumber(transactionDto.transactionBy());
+
+            send.setBalanceDollar(balanceBy - transactionDto.amount());
+            receiver.setBalanceDollar(balanceTo + transactionDto.amount());
         }
         else throw new InsufficientBalance("Transaction not permitted");
 
@@ -123,28 +129,33 @@ public class TransactionService {
         userService.save(receiver);
 
         Transaction transaction = new Transaction(transactionDto);
-        transaction.setCreatedAt(LocalDateTime.now());
-        transaction.setLimitDay(transactionDto.amount());
+        transaction.setCreatedAt(LocalDate.now());
+        transaction.setLimitDay(limitDay);
+        transaction.setLimitUsed(transactionDto.amount());
+        transaction.setQuote(quote);
 
         return transactionRepository.save(transaction);
     }
 
-    public void limitExceeded(String documentNumber, Double amount) {
+    public Double limitExceeded(String documentNumber, Double amount) {
         Double total = transactionRepository.limitDay(documentNumber, LocalDate.now());
-        TypeUser typeUser = userService.getTypeUserByDocument(documentNumber);
+        User user = userService.getUserByDocumentNumber(documentNumber);
+        TypeUser typeUser = user.getType();
 
-        Boolean limitExceeded;
-
-        if (Objects.equals(typeUser, TypeUser.PF)) {
-            limitExceeded = total + amount >= 100000;
-        } else if (Objects.equals(typeUser, TypeUser.PJ)) {
-            limitExceeded = total + amount >= 50000;
+        double dailyLimit;
+        if (typeUser == TypeUser.PF) {
+            dailyLimit = 10000.0;
+        } else if (typeUser == TypeUser.PJ) {
+            dailyLimit = 50000.0;
+        } else {
+            throw new NotExist("User Type not found");
         }
-        else
-            throw new NotExist("Balance Type not found");
 
-        if (limitExceeded) {
+        double totalAfterTransaction = total + amount;
+        if (totalAfterTransaction > dailyLimit) {
             throw new TransactionFail("Daily transaction limit exceeded");
         }
+
+        return dailyLimit - totalAfterTransaction;
     }
 }

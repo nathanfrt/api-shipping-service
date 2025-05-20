@@ -5,6 +5,7 @@ import com.inter.shipping_service.exception.NotExist;
 import com.inter.shipping_service.model.OlindaResponse;
 import com.inter.shipping_service.model.Value;
 import com.inter.shipping_service.repository.ExchangeRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -16,23 +17,23 @@ import java.time.format.DateTimeFormatter;
 @Service
 public class ExchangeService {
 
+    @Autowired
     private ExchangeRepository exchangeRepository;
+
+    @Autowired
     private UserService userService;
 
-    // Conversão de dollar para Real
     public Double conversionCurrency(String documentNumber, Double amount, Double quote){
         userService.exceptionDocumentNumber(documentNumber);
 
-        if (!existsBalanceToTransactionUSD(documentNumber,amount, quote)){
-            throw new InsufficientBalance("Insufficient balance");
-        }
-
-        var balance = userService.getBalanceRealByDocumentNumber(documentNumber);
-        Double transferAmount = balance / quote;
+        var balanceReal = userService.getBalanceRealByDocumentNumber(documentNumber);
+        Double transferAmount = balanceReal / quote;
 
         var user = userService.getUserByDocumentNumber(documentNumber);
-        user.setBalanceReal(user.getBalanceReal() - transferAmount);
-        user.setBalanceDollar(user.getBalanceDollar() + amount);
+        Double balanceDollar = userService.getBalanceDollarByDocumentNumber(documentNumber);
+
+        user.setBalanceReal(balanceReal - transferAmount);
+        user.setBalanceDollar(balanceDollar + amount);
         userService.save(user);
 
         return transferAmount;
@@ -40,7 +41,7 @@ public class ExchangeService {
 
     // Verifica se existe valor para transf. USD
     public Boolean existsBalanceToTransactionUSD(String documentNumber, Double amount, Double quote){
-        var balance = userService.getBalanceRealByDocumentNumber(documentNumber);
+        Double balance = userService.getBalanceDollarByDocumentNumber(documentNumber);
         return (balance / quote) >= amount;
     }
 

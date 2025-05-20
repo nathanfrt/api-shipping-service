@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -73,19 +74,21 @@ public class UserService {
     }
 
     // Busca saldos para det. documento
-    public BalanceResponse getBalanceByDocumentNumber(String documentNumber){
+    public Optional<BalanceResponse> getBalanceByDocumentNumber(String documentNumber){
         exceptionDocumentNumber(documentNumber);
         return userRepository.findBalanceByDocumentNumber(documentNumber);
     }
 
+    // Busca saldo em BRL
     public Double getBalanceRealByDocumentNumber(String documentNumber){
         exceptionDocumentNumber(documentNumber);
         return userRepository.findBalanceRealByDocumentNumber(documentNumber);
     }
 
-    public Double getBalanceDolarByDocumentNumber(String documentNumber){
+    // Busca saldo em USA
+    public Double getBalanceDollarByDocumentNumber(String documentNumber){
         exceptionDocumentNumber(documentNumber);
-        return userRepository.findBalanceDolarByDocumentNumber(documentNumber);
+        return userRepository.findBalanceDollarByDocumentNumber(documentNumber);
     }
 
     // Exibe exception caso não exista usuário para det. documento
@@ -104,10 +107,5 @@ public class UserService {
     public String removeNonNumericCharacters(String text) {
         if (text == null) { return null; }
         return text.replaceAll("[^0-9]", "");
-    }
-
-    // Verifica o tipo de conta
-    public TypeUser getTypeUserByDocument(String documentNumber){
-        return userRepository.findTypeUserByDocumentNumber(documentNumber);
     }
 }
