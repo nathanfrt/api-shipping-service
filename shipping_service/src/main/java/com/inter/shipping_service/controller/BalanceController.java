@@ -1,7 +1,6 @@
 package com.inter.shipping_service.controller;
 
 import com.inter.shipping_service.dto.BalanceDto;
-import com.inter.shipping_service.model.TypeBalance;
 import com.inter.shipping_service.service.BalanceService;
 import com.inter.shipping_service.service.UserService;
 import jakarta.validation.Valid;

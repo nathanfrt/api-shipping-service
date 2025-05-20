@@ -1,7 +1,6 @@
 package com.inter.shipping_service.controller;
 
 import com.inter.shipping_service.dto.TransactionDto;
-import com.inter.shipping_service.exception.InsufficientBalance;
 import com.inter.shipping_service.exception.TransactionFail;
 import com.inter.shipping_service.model.Transaction;
 import com.inter.shipping_service.service.TransactionService;

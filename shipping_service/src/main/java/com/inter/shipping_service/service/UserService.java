@@ -96,13 +96,19 @@ public class UserService {
         }
     }
 
+    // Salva usuário
     public void save(User user) {
         userRepository.save(user);
     }
 
+    // Permite apenas números
     public String removeNonNumericCharacters(String text) {
         if (text == null) { return null; }
         return text.replaceAll("[^0-9]", "");
     }
 
+    // Verifica o tipo de conta
+    public TypeUser getTypeUserByDocument(String documentNumber){
+        return userRepository.findTypeUserByDocumentNumber(documentNumber);
+    }
 }

@@ -32,7 +32,7 @@ public class Transaction {
     private String transactionTo;
 
     private LocalDateTime createdAt;
-    private Double limit;
+    private Double limitDay;
 
     public Transaction(TransactionDto transactionDto) {
         BeanUtils.copyProperties(transactionDto, this);

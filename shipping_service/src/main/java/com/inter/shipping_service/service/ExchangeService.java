@@ -1,21 +1,16 @@
 package com.inter.shipping_service.service;
 
-import com.inter.shipping_service.dto.ExchangeDto;
 import com.inter.shipping_service.exception.InsufficientBalance;
 import com.inter.shipping_service.exception.NotExist;
-import com.inter.shipping_service.model.Exchange;
 import com.inter.shipping_service.model.OlindaResponse;
 import com.inter.shipping_service.model.Value;
 import com.inter.shipping_service.repository.ExchangeRepository;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 @Service

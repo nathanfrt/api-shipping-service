@@ -4,7 +4,6 @@ import com.inter.shipping_service.dto.BalanceDto;
 import com.inter.shipping_service.exception.InvalidDocument;
 import com.inter.shipping_service.model.*;
 import com.inter.shipping_service.repository.BalanceRepository;
-import jakarta.persistence.Tuple;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -44,5 +43,4 @@ public class BalanceService {
         newBalance.setCreatedAt(LocalDateTime.now());
         balanceRepository.save(newBalance);
     }
-
 }

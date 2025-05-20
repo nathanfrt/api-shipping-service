@@ -3,13 +3,16 @@ package com.inter.shipping_service.service;
 import com.inter.shipping_service.dto.TransactionDto;
 import com.inter.shipping_service.exception.InsufficientBalance;
 import com.inter.shipping_service.exception.NotExist;
+import com.inter.shipping_service.exception.TransactionFail;
 import com.inter.shipping_service.model.Transaction;
+import com.inter.shipping_service.model.TypeBalance;
+import com.inter.shipping_service.model.TypeUser;
 import com.inter.shipping_service.repository.TransactionRepository;
 import jakarta.transaction.Transactional;
-import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -54,6 +57,8 @@ public class TransactionService {
         var quote = exchangeService.getQuote_External(LocalDateTime.now().toString());
         var conversion = exchangeService.conversionCurrency(transactionDto.transactionBy(), transactionDto.amount(), quote);
 
+        limitExceeded(transactionDto.transactionBy(), transactionDto.amount());
+
         if (!exchangeService.existsBalanceToTransactionUSD(transactionDto.transactionBy(), transactionDto.amount(), quote)) {
             cancelledTransaction(transactionDto.transactionBy(), conversion);
             throw new InsufficientBalance("Insufficient balance");
@@ -73,6 +78,7 @@ public class TransactionService {
         if (!existsBalanceToTransactionBR(transactionDto.transactionBy(),transactionDto.amount())) {
             throw new InsufficientBalance("Insufficient balance");
         }
+        limitExceeded(transactionDto.transactionBy(), transactionDto.amount());
         return transactionBank(transactionDto, "BRL");
     }
 
@@ -87,6 +93,7 @@ public class TransactionService {
         if (!exchangeService.existsBalanceToTransactionUSD(transactionDto.transactionBy(),transactionDto.amount(), quote)) {
             throw new InsufficientBalance("Insufficient balance");
         }
+        limitExceeded(transactionDto.transactionBy(), transactionDto.amount());
         return transactionBank(transactionDto, "USA");
     }
 
@@ -100,6 +107,8 @@ public class TransactionService {
 
         var send = userService.getUserByDocumentNumber(transactionDto.transactionBy());
         var receiver = userService.getUserByDocumentNumber(transactionDto.transactionTo());
+
+        limitExceeded(transactionDto.transactionBy(), transactionDto.amount());
 
         if (typeBalance.equals("BRL")) {
             send.setBalanceReal(send.getBalanceReal() - transactionDto.amount());
@@ -116,7 +125,27 @@ public class TransactionService {
 
         Transaction transaction = new Transaction(transactionDto);
         transaction.setCreatedAt(LocalDateTime.now());
+        transaction.setLimitDay(transactionDto.amount());
 
         return transactionRepository.save(transaction);
+    }
+
+    public void limitExceeded(String documentNumber, Double amount) {
+        Double total = transactionRepository.limitDay(documentNumber, LocalDate.now());
+        TypeUser typeUser = userService.getTypeUserByDocument(documentNumber);
+
+        Boolean limitExceeded;
+
+        if (Objects.equals(typeUser, TypeUser.PF)) {
+            limitExceeded = total + amount >= 100000;
+        } else if (Objects.equals(typeUser, TypeUser.PJ)) {
+            limitExceeded = total + amount >= 50000;
+        }
+        else
+            throw new NotExist("Balance Type not found");
+
+        if (limitExceeded) {
+            throw new TransactionFail("Daily transaction limit exceeded");
+        }
     }
 }
