@@ -17,41 +17,60 @@ public class UserController {
 
     @GetMapping(value = "/all/")
     public ResponseEntity<?> users(){
-        var users = userService.getUsers();
+        try {
+            var users = userService.getUsers();
 
-        if (users.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Users not found");
+            if (users.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Users not found");
+            }
+            return ResponseEntity.status(HttpStatus.CREATED).body(users);
         }
-        return ResponseEntity.status(HttpStatus.CREATED).body(users);
+        catch (Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 
     @GetMapping(value = "/id")
     public ResponseEntity<?> getUserById(@RequestParam long id){
-        if (!userService.existUserById(id)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User not found");
+        try {
+            if (!userService.existUserById(id)) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User not found");
+            }
+            var user = userService.getUserById(id);
+            return ResponseEntity.status(HttpStatus.CREATED).body(user);
         }
-        var user = userService.getUserById(id);
-        return ResponseEntity.status(HttpStatus.CREATED).body(user);
+        catch (Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 
     @GetMapping(value = "/documentNumber")
     public ResponseEntity<?> getBalanceByDocumentNumber(@RequestParam String documentNumber){
-        if (!userService.existsUserByDocumentNumber(documentNumber)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User not found");
+        try {
+            if (!userService.existsUserByDocumentNumber(documentNumber)) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User not found");
+            }
+            var user = userService.getUserByDocumentNumber(documentNumber);
+            return ResponseEntity.status(HttpStatus.CREATED).body(user);
         }
-        var user = userService.getUserByDocumentNumber(documentNumber);
-        return ResponseEntity.status(HttpStatus.CREATED).body(user);
+        catch (Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 
     @PostMapping(value = "/create/")
     public ResponseEntity<?> postUser(@RequestBody @Valid UserDto userDto){
-        if (userService.existsUserByDocumentNumber(userDto.documentNumber())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Document is already registered");
+        try {
+            if (userService.existsUserByDocumentNumber(userDto.documentNumber())) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Document is already registered");
+            } else if (userService.existUserByEmail(userDto.email())) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("E-mail is already registered");
+            }
+            var user = userService.saveUser(userDto);
+            return ResponseEntity.status(HttpStatus.CREATED).body(user);
         }
-        else if (userService.existUserByEmail(userDto.email())){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("E-mail is already registered");
+        catch (Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
-        var user = userService.saveUser(userDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(user);
     }
 }

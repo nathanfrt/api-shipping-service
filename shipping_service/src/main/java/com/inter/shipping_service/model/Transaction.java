@@ -25,9 +25,6 @@ public class Transaction {
     private Double quote;
     private Double conversionAmount;
 
-    @NotNull
-    private Boolean conversion;
-
     private String transactionBy;
     private String transactionTo;
 
