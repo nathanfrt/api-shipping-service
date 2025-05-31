@@ -5,6 +5,8 @@ import com.inter.shipping_service.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/user")
 @Tag(name = "Usuário", description = "Controlador para cadastrar e consultar usuários")
 public class UserController {
+
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
     @Autowired
     private UserService userService;
@@ -25,12 +29,14 @@ public class UserController {
             var users = userService.getUsers();
 
             if (users.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Users not found");
+                logger.warn("Users not found");
+                return ResponseEntity.notFound().build();
             }
             return ResponseEntity.status(HttpStatus.CREATED).body(users);
         }
         catch (Exception e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            logger.error("Error fetching users: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
@@ -39,13 +45,15 @@ public class UserController {
     public ResponseEntity<?> getUserById(@RequestParam long id){
         try {
             if (!userService.existUserById(id)) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User not found");
+                logger.warn("User not found");
+                return ResponseEntity.notFound().build();
             }
             var user = userService.getUserById(id);
             return ResponseEntity.status(HttpStatus.CREATED).body(user);
         }
         catch (Exception e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            logger.error("Error fetching users: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
@@ -54,13 +62,15 @@ public class UserController {
     public ResponseEntity<?> getBalanceByDocumentNumber(@RequestParam String documentNumber){
         try {
             if (!userService.existsUserByDocumentNumber(documentNumber)) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User not found");
+                logger.warn("User not found");
+                return ResponseEntity.notFound().build();
             }
             var user = userService.getUserByDocumentNumber(documentNumber);
             return ResponseEntity.status(HttpStatus.CREATED).body(user);
         }
         catch (Exception e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            logger.error("Error fetching users: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
@@ -69,15 +79,18 @@ public class UserController {
     public ResponseEntity<?> postUser(@RequestBody @Valid UserDto userDto){
         try {
             if (userService.existsUserByDocumentNumber(userDto.documentNumber())) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Document is already registered");
+                logger.warn("User already registered");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User already registered");
             } else if (userService.existUserByEmail(userDto.email())) {
+                logger.warn("E-mail is already registered");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("E-mail is already registered");
             }
             var user = userService.saveUser(userDto);
             return ResponseEntity.status(HttpStatus.CREATED).body(user);
         }
         catch (Exception e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            logger.error("Error creating user: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 }

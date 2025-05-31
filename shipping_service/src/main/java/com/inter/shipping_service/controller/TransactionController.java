@@ -8,15 +8,19 @@ import com.inter.shipping_service.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.slf4j.Logger;
 
 @RestController
 @RequestMapping("/transaction")
 @Tag(name = "Transações/Transferências bancárias", description = "Controlador para obter e realizar transações entre usuários")
 public class TransactionController {
+
+    private static final Logger logger = LoggerFactory.getLogger(TransactionController.class);
 
     @Autowired
     private TransactionService transactionService;
@@ -33,7 +37,8 @@ public class TransactionController {
             return ResponseEntity.status(HttpStatus.OK).body(transaction);
         }
         catch (Exception e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            logger.error("Error fetching transactions: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
@@ -47,7 +52,8 @@ public class TransactionController {
             return ResponseEntity.status(HttpStatus.OK).body(transaction);
         }
         catch (Exception e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            logger.error("Error fetching transactions: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
@@ -58,12 +64,14 @@ public class TransactionController {
             var transaction = transactionService.transactionBRLToBRL(transactionDto);
 
             if (transaction == null) {
-                throw new TransactionFail("Transaction fail");
+                logger.warn("Transaction fail");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Transaction fail");
             }
             return ResponseEntity.status(HttpStatus.CREATED).body(transaction);
         }
         catch (Exception e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            logger.error("Error fetching transactions: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
@@ -74,12 +82,14 @@ public class TransactionController {
             var transaction = transactionService.transactionUSAToUSA(transactionDto);
 
             if (transaction == null) {
-                throw new TransactionFail("Transaction fail");
+                logger.warn("Transaction fail");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Transaction fail");
             }
             return ResponseEntity.status(HttpStatus.CREATED).body(transaction);
         }
         catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            logger.error("Error fetching transactions: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
@@ -90,12 +100,14 @@ public class TransactionController {
             Transaction transaction = transactionService.postRemessaService(transactionDto);
 
             if (transaction == null) {
-                throw new TransactionFail("Transaction fail");
+                logger.warn("Transaction fail");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Transaction fail");
             }
             return ResponseEntity.status(HttpStatus.CREATED).body(transaction);
         }
         catch (Exception e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            logger.error("Error fetching transactions: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 }

@@ -4,6 +4,8 @@ import com.inter.shipping_service.service.ExchangeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +18,8 @@ import java.time.format.DateTimeFormatter;
 @RequestMapping("/exchange")
 @Tag(name = "Câmbio", description = "Controlador para verificar o câmbio atual e comprar USD")
 public class ExchangeController {
+
+    private static final Logger logger = LoggerFactory.getLogger(ExchangeController.class);
 
     @Autowired
     private ExchangeService exchangeService;
@@ -31,10 +35,12 @@ public class ExchangeController {
             if (result > 0){
                 return ResponseEntity.status(HttpStatus.OK).body(result);
             }
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Quote not found");
+            logger.warn("Quote not found");
+            return ResponseEntity.notFound().build();
 
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when checking quote: " + e.getMessage());
+            logger.error("Error when checking quote: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
@@ -46,12 +52,14 @@ public class ExchangeController {
             var converts = exchangeService.conversionCurrency(documentNumber, amountReal, quote);
 
             if (converts == null || converts < 0.01) {
+                logger.warn("Convert fail.");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Convert fail.");
             }
             return ResponseEntity.status(HttpStatus.CREATED).body("Value converted: " + converts);
         }
         catch (Exception e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            logger.error("Error when converting currency: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 }
