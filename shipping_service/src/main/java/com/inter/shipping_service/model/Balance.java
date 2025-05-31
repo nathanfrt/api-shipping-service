@@ -1,6 +1,8 @@
 package com.inter.shipping_service.model;
 
 import com.inter.shipping_service.dto.BalanceDto;
+import com.inter.shipping_service.dto.BalanceResponseDto;
+import com.inter.shipping_service.dto.UserDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -30,6 +32,8 @@ public class Balance {
     public Balance(BalanceDto balance){
         BeanUtils.copyProperties(balance, this);
     }
-
+    public Balance(BalanceResponseDto balance){
+        BeanUtils.copyProperties(balance, this);
+    }
 }
 

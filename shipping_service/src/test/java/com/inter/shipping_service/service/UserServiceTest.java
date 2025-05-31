@@ -1,9 +1,8 @@
 package com.inter.shipping_service.service;
 
+import com.inter.shipping_service.dto.BalanceResponseDto;
 import com.inter.shipping_service.dto.UserDto;
-import com.inter.shipping_service.exception.InvalidDocument;
 import com.inter.shipping_service.exception.NotExist;
-import com.inter.shipping_service.model.BalanceResponse;
 import com.inter.shipping_service.model.TypeUser;
 import com.inter.shipping_service.model.User;
 import com.inter.shipping_service.repository.UserRepository;
@@ -132,15 +131,15 @@ class UserServiceTest {
 
     @Test
     void getBalanceByDocumentNumber_ReturnsOptional() {
-        BalanceResponse response = new BalanceResponse(1L, 100.0, 20.0);
+        BalanceResponseDto response = new BalanceResponseDto( 100.0, 20.0);
 
         when(userRepository.existsByDocumentNumber(docPF)).thenReturn(true);
         when(userRepository.findBalanceByDocumentNumber(docPF)).thenReturn(Optional.of(response));
 
-        Optional<BalanceResponse> result = userService.getBalanceByDocumentNumber(docPF);
+        Optional<BalanceResponseDto> result = userService.getBalanceByDocumentNumber(docPF);
 
         assertTrue(result.isPresent());
-        assertEquals(100.0, result.get().getBalanceReal());
+        assertEquals(100.0, result.get().balanceReal());
     }
 
     @Test

@@ -1,8 +1,7 @@
 package com.inter.shipping_service.repository;
 
+import com.inter.shipping_service.dto.BalanceResponseDto;
 import com.inter.shipping_service.dto.UserDto;
-import com.inter.shipping_service.model.BalanceResponse;
-import com.inter.shipping_service.model.TypeUser;
 import com.inter.shipping_service.model.User;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.DisplayName;
@@ -90,16 +89,16 @@ class UserRepositoryTest {
     @DisplayName("Should find balance by document number")
     void shouldFindBalanceByDocumentNumber() {
         persistUser(MOCK_DTO);
-        Optional<BalanceResponse> balance = userRepository.findBalanceByDocumentNumber(MOCK_DTO.documentNumber());
+        Optional<BalanceResponseDto> balance = userRepository.findBalanceByDocumentNumber(MOCK_DTO.documentNumber());
         assertThat(balance).isPresent();
-        assertThat(balance.get().getBalanceReal()).isEqualTo(150.00);
-        assertThat(balance.get().getBalanceDollar()).isEqualTo(180.00);
+        assertThat(balance.get().balanceReal()).isEqualTo(150.00);
+        assertThat(balance.get().balanceDollar()).isEqualTo(180.00);
     }
 
     @Test
     @DisplayName("Should not find balance by document number")
     void shouldNotFindBalanceByDocumentNumber() {
-        Optional<BalanceResponse> balance = userRepository.findBalanceByDocumentNumber("00000000000");
+        Optional<BalanceResponseDto> balance = userRepository.findBalanceByDocumentNumber("00000000000");
         assertThat(balance).isEmpty();
     }
 

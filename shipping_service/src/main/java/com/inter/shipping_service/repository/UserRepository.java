@@ -1,7 +1,6 @@
 package com.inter.shipping_service.repository;
 
-import com.inter.shipping_service.model.BalanceResponse;
-import com.inter.shipping_service.model.TypeUser;
+import com.inter.shipping_service.dto.BalanceResponseDto;
 import com.inter.shipping_service.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -22,7 +21,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     User findUserByDocumentNumber(String documentNumber);
 
-    @Query("SELECT new BalanceResponse(u.id, u.balanceReal, u.balanceDollar) FROM User u WHERE u.documentNumber = :documentNumber")
-    Optional<BalanceResponse> findBalanceByDocumentNumber(@Param("documentNumber") String documentNumber);
+    @Query("SELECT new com.inter.shipping_service.dto.BalanceResponseDto(u.balanceReal, u.balanceDollar) FROM User u WHERE u.documentNumber = :documentNumber")
+    Optional<BalanceResponseDto> findBalanceByDocumentNumber(@Param("documentNumber") String documentNumber);
 
 }

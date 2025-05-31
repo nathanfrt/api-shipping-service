@@ -1,9 +1,9 @@
 package com.inter.shipping_service.service;
 
+import com.inter.shipping_service.dto.BalanceResponseDto;
 import com.inter.shipping_service.dto.UserDto;
 import com.inter.shipping_service.exception.InvalidDocument;
 import com.inter.shipping_service.exception.NotExist;
-import com.inter.shipping_service.model.BalanceResponse;
 import com.inter.shipping_service.model.TypeUser;
 import com.inter.shipping_service.model.User;
 import com.inter.shipping_service.repository.UserRepository;
@@ -76,7 +76,7 @@ public class UserService {
     }
 
     // Busca saldos para det. documento
-    public Optional<BalanceResponse> getBalanceByDocumentNumber(String documentNumber){
+    public Optional<BalanceResponseDto> getBalanceByDocumentNumber(String documentNumber){
         exceptionDocumentNumber(documentNumber);
         return userRepository.findBalanceByDocumentNumber(documentNumber);
     }
