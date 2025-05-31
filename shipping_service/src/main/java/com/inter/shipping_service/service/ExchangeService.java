@@ -1,9 +1,8 @@
 package com.inter.shipping_service.service;
 
-import com.inter.shipping_service.exception.InsufficientBalance;
+import com.inter.shipping_service.dto.OlindaResponseDto;
+import com.inter.shipping_service.dto.ValueDto;
 import com.inter.shipping_service.exception.NotExist;
-import com.inter.shipping_service.model.OlindaResponse;
-import com.inter.shipping_service.model.Value;
 import com.inter.shipping_service.repository.ExchangeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -63,12 +62,12 @@ public class ExchangeService {
             String url = "https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata/" +
                     "CotacaoDolarDia(dataCotacao=@dataCotacao)?@dataCotacao='" + dateFormat + "'&$format=json";
 
-            ResponseEntity<OlindaResponse> response = restTemplate.getForEntity(url, OlindaResponse.class);
-            OlindaResponse body = response.getBody();
+            ResponseEntity<OlindaResponseDto> response = restTemplate.getForEntity(url, OlindaResponseDto.class);
+            OlindaResponseDto body = response.getBody();
 
-            if (body != null && body.getValue() != null && !body.getValue().isEmpty()) {
-                Value quote = body.getValue().getFirst();
-                Double rawValue = quote.getCotacaoCompra();
+            if (body != null && body.value() != null && !body.value().isEmpty()) {
+                ValueDto quote = body.value().getFirst();
+                Double rawValue = quote.cotacaoCompra();
 
                 Double roundedValue = BigDecimal.valueOf(rawValue)
                         .setScale(2, RoundingMode.HALF_UP)
