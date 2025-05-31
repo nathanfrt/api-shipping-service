@@ -1,5 +1,6 @@
 package com.inter.shipping_service.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.inter.shipping_service.dto.UserDto;
 import jakarta.persistence.*;
 import lombok.*;
@@ -19,6 +20,8 @@ public class User {
     private long id;
 
     private String name;
+
+    @JsonIgnore
     private String password;
 
     @Column(unique = true)

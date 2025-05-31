@@ -10,7 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@RestController
+@RestController 
 @RequestMapping("/user")
 @Tag(name = "Usuário", description = "Controlador para cadastrar e consultar usuários")
 public class UserController {
